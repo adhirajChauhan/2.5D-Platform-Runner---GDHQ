@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -16,10 +17,24 @@ public class Player : MonoBehaviour
     private float yVelocity;
     private bool _canDoubleJump = false;
 
+    [SerializeField]
+    private int _coins;
+    private UIManager _uiManager;
+    [SerializeField]
+    private int _lives = 3;
+
     // Start is called before the first frame update
     void Start()
     {
         _controller = GetComponent<CharacterController>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+
+        if (_uiManager == null)
+        {
+            Debug.LogError("UI manager is NULL");
+        }
+
+        _uiManager.UpdateLiveDisplay(_lives);
 
     }
 
@@ -56,5 +71,24 @@ public class Player : MonoBehaviour
         direction.y = yVelocity;
 
         _controller.Move(direction * Time.deltaTime);
+    }
+
+    public void AddCoins()
+    {
+        _coins++;
+
+        _uiManager.UpdateCoinDisplay(_coins);
+    }
+
+    public void Damage()
+    {
+        _lives--;
+
+        _uiManager.UpdateLiveDisplay(_lives);
+
+        if (_lives < 1)
+        {
+            SceneManager.LoadScene(0);
+        }
     }
 }
